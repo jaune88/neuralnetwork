@@ -47,14 +47,15 @@ export default function Canvas({ gridSize, pixelSize, handlePredict, onClear}: C
     }, [pixels, GRID_SIZE, PIXEL_SIZE]);
 
     function drawPixelAt(row: number, col: number) {
-        if (row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE) {
-            setPixels(prev => {
-                const next = prev.map(arr => [...arr]);
-                next[row][col] = 1;
-                return next;
-            });
-        }
-    }
+    setPixels(prev => {
+        const next = prev.map(arr => [...arr]);
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                const r = row + dr;
+                const c = col + dc;
+                if (r >= 0 && r < GRID_SIZE && c >= 0 && c < GRID_SIZE) {
+                    next[r][c] = (dr === 0 && dc === 0) ? 1 : 0.7;}}}
+        return next;})};
 
     // Bresenham's line algorithm for pixel interpolation
     function drawLine(from: Coordinate, to: Coordinate) {
