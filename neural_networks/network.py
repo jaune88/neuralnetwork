@@ -1,5 +1,6 @@
 # builtin
 from __future__ import annotations
+import json
 
 # external
 import numpy as np
@@ -32,9 +33,34 @@ class NeuralNetwork():
             self.layers.append(layer)
     
     @classmethod
-    def from_save(cls, path: str) -> NeuralNetwork:
-        raise Exception("TODO: Not yet implemented")
-    
+    def load_network(cls, path: str, loss_function):
+        with open(path, "r") as f:
+            data = json.load(f)
+
+        # Initialize a new network with the same structure
+        net = cls(
+            dimensions=data["dimensions"],
+            learning_rate=data["learning_rate"],
+            loss_function=loss_function
+        )
+
+        # Assign saved weights, biases, and activations
+        for layer, saved_layer in zip(net.layers, data["layers"]):
+            layer.weights = np.array(saved_layer["weights"])
+            layer.biases = np.array(saved_layer["biases"])
+
+            # Recreate correct activation function
+            act_name = saved_layer["activation"]
+            if act_name == "ReLU":
+                layer.activation = ReLU()
+            elif act_name == "Softmax":
+                layer.activation = Softmax()
+            else:
+                raise ValueError(f"Unknown activation type: {act_name}")
+
+        print(f"✅ Network loaded from {path}")
+        return net
+        
     def predict(self, input: np.ndarray) -> np.ndarray:
         x = input
         for layer in self.layers:
@@ -42,7 +68,33 @@ class NeuralNetwork():
         return x
 
     def train(self, input: np.ndarray, response: np.ndarray) -> np.ndarray:
-        raise Exception("TODO: Not yet implemented")
+        x = input
+        for layer in self.layers:
+            x = layer.forward(x)
+        prediction = x
+        
+        grad = self.loss_function.get_training_loss(response, prediction)
+        
+        for layer in reversed(self.layers):
+            grad = layer.backward(grad, self.learning_rate)
+        return prediction
     
     def save_network(self, path: str):
-        raise Exception("TODO: Not yet implemented")
+        data = {
+            "dimensions": self.dimensions,
+            "learning_rate": self.learning_rate,
+            "layers": []
+        }
+
+        for layer in self.layers:
+            layer_info = {
+                "weights": layer.weights.tolist(),
+                "biases": layer.biases.tolist(),
+                "activation": layer.activation.__class__.__name__
+            }
+            data["layers"].append(layer_info)
+
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)
+
+        print(f"✅ Network saved to {path}")

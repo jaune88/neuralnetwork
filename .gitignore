@@ -1,2 +1,24 @@
-**/__pycache__/
-/data/
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+
+# Data and model outputs
+data/
+*.csv
+*.npz
+*.npy
+*.jpg
+*.jpeg
+*.png
+
+# VS Code settings
+.vscode/
