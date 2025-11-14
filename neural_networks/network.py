@@ -58,7 +58,7 @@ class NeuralNetwork():
             else:
                 raise ValueError(f"Unknown activation type: {act_name}")
 
-        print(f"✅ Network loaded from {path}")
+        print(f"Network loaded from {path}")
         return net
         
     def predict(self, input: np.ndarray) -> np.ndarray:
@@ -97,4 +97,4 @@ class NeuralNetwork():
         with open(path, "w") as f:
             json.dump(data, f, indent=4)
 
-        print(f"✅ Network saved to {path}")
+        print(f"Network saved to {path}")
